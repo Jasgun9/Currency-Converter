@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💱 Currency Converter</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at top left, #0f172a, #1e293b, #020617);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .glow-bg {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(125,211,252,0.3), transparent 70%);
+      filter: blur(100px);
+      top: -100px;
+      right: -100px;
+      animation: moveGlow 8s infinite alternate ease-in-out;
+    }
+
+    @keyframes moveGlow {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(-100px,80px) scale(1.1); }
+    }
+
+    .converter {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(125, 211, 252, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 35px 30px;
+      width: 340px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .converter:hover {
+      box-shadow: 0 0 35px rgba(125, 211, 252, 0.4);
+      transform: scale(1.03);
+    }
+
+    h2 {
+      font-weight: 600;
+      margin-bottom: 22px;
+      font-size: 1.6rem;
+      color: #7dd3fc;
+      letter-spacing: 1px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 8px #7dd3fc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #7dd3fc, #38bdf8);
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(56,189,248,0.4);
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #38bdf8, #0ea5e9);
+      box-shadow: 0 0 25px rgba(56,189,248,0.7);
+      transform: translateY(-2px);
+    }
+
+    .result {
+      margin-top: 25px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #7dd3fc;
+      text-shadow: 0 0 8px rgba(125,211,252,0.6);
+    }
+
+    .small {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      margin-top: 8px;
+    }
+
+    .logo {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      animation: float 2.5s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg"></div>
+  
+  <div class="converter" data-aos="fade-up">
+    <div class="logo">💱</div>
+    <h2>Currency Converter</h2>
+    
+    <input type="number" id="amount" value="1" min="0" placeholder="Enter amount" />
+    
+    <select id="from"></select>
+    <select id="to"></select>
+    
+    <button id="convertBtn">Convert</button>
+    
+    <div class="result" id="result">Ready to convert 🌍</div>
+    <div class="small" id="updated"></div>
+  </div>
+
+  <script>
+    const fromEl = document.getElementById("from");
+    const toEl = document.getElementById("to");
+    const resultEl = document.getElementById("result");
+    const updatedEl = document.getElementById("updated");
+    const amountEl = document.getElementById("amount");
+
+    async function loadCurrencies() {
+      try {
+        const res = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.min.json");
+        const data = await res.json();
+        const symbols = Object.values(data);
+        console.log(symbols);
+        symbols.sort().forEach(sym => {
+            if(sym===""){
+    
+            }
+            else{
+          fromEl.innerHTML += `<option style="color: black;" value="${sym}">${sym}</option>`;
+          toEl.innerHTML += `<option style="color: black;" value="${sym}">${sym}</option>`;}
+        });
+        fromEl.value = "US Dollar";
+        toEl.value = "Indian Rupee";
+      } catch {
+        alert("Error loading currencies!");
+      }
+    }
+
+    async function convert() {
+      const amount = parseFloat(amountEl.value);
+      if (!amount) return alert("Please enter a valid amount!");
+      const from = fromEl.value;
+      const to = toEl.value;
+
+      resultEl.textContent = "Converting...";
+try{
+   
+        const resn = await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.min.json");
+        const datan = await resn.json();
+
+        const res = await fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${Object.entries(datan).find(([k, v]) => v === from)?.[0]}.json`);
+        const data = await res.json();
+
+        const fina = data[Object.entries(datan).find(([k, v]) => v === from)?.[0]][Object.entries(datan).find(([k, v]) => v === to)?.[0]];
+
+        const val = fina * amount;
+        
+        resultEl.textContent = `${amount} ${from} = ${val.toFixed(2)} ${to}`;
+        updatedEl.textContent = `Updated: ${data.date}`;}
+        catch{
+            resultEl.textContent = "Some Error Occured";
+        }
+    
+    }
+
+    document.getElementById("convertBtn").addEventListener("click", convert);
+    loadCurrencies();
+  </script>
+</body>
+</html>
